@@ -200,7 +200,7 @@ export default function SkillAssessment() {
         title: 'Assessment Complete!',
         description: 'Your personalized career recommendations are ready.',
       });
-      navigate('/');
+      navigate('/assessment-results');
     }
   };
 
