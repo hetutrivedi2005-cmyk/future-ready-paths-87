@@ -16,21 +16,34 @@ import {
   Target,
   Sparkles,
   MapPin,
-  GraduationCap
+  GraduationCap,
+  ExternalLink,
+  PlayCircle
 } from 'lucide-react';
 import { useAssessment } from '@/contexts/AssessmentContext';
 
+interface LearningResource {
+  name: string;
+  provider: string;
+  type: 'course' | 'certification' | 'bootcamp' | 'free';
+  url: string;
+  duration: string;
+}
+
+interface CareerRecommendation {
+  title: string;
+  description: string;
+  matchScore: number;
+  skills: string[];
+  timeToTransition: string;
+  salaryRange: string;
+  growthOutlook: string;
+  resources: LearningResource[];
+}
+
 // Career recommendations based on assessment data
-const getCareerRecommendations = (assessment: any) => {
-  const recommendations: {
-    title: string;
-    description: string;
-    matchScore: number;
-    skills: string[];
-    timeToTransition: string;
-    salaryRange: string;
-    growthOutlook: string;
-  }[] = [];
+const getCareerRecommendations = (assessment: any): CareerRecommendation[] => {
+  const recommendations: CareerRecommendation[] = [];
 
   const { interests, skills, goals, experience } = assessment;
 
@@ -44,6 +57,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '3-6 months',
       salaryRange: '₹5-15 LPA',
       growthOutlook: 'High demand, 25% growth expected',
+      resources: [
+        { name: 'Google Data Analytics Certificate', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/google-data-analytics', duration: '6 months' },
+        { name: 'Data Analyst Nanodegree', provider: 'Udacity', type: 'bootcamp', url: 'https://www.udacity.com/course/data-analyst-nanodegree--nd002', duration: '4 months' },
+        { name: 'SQL for Data Science', provider: 'Coursera', type: 'course', url: 'https://www.coursera.org/learn/sql-for-data-science', duration: '4 weeks' },
+        { name: 'Python for Data Analysis', provider: 'freeCodeCamp', type: 'free', url: 'https://www.freecodecamp.org/learn/data-analysis-with-python/', duration: '300 hours' },
+      ],
     });
     
     if (skills.includes('programming')) {
@@ -55,6 +74,12 @@ const getCareerRecommendations = (assessment: any) => {
         timeToTransition: '6-12 months',
         salaryRange: '₹8-25 LPA',
         growthOutlook: 'Very high demand globally',
+        resources: [
+          { name: 'Meta Front-End Developer', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/meta-front-end-developer', duration: '7 months' },
+          { name: 'Full Stack Open', provider: 'University of Helsinki', type: 'free', url: 'https://fullstackopen.com/en/', duration: '3-6 months' },
+          { name: 'The Odin Project', provider: 'The Odin Project', type: 'free', url: 'https://www.theodinproject.com/', duration: 'Self-paced' },
+          { name: 'React - The Complete Guide', provider: 'Udemy', type: 'course', url: 'https://www.udemy.com/course/react-the-complete-guide-incl-redux/', duration: '48 hours' },
+        ],
       });
     }
   }
@@ -69,6 +94,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '6-12 months',
       salaryRange: '₹6-18 LPA',
       growthOutlook: 'Steady growth with aging population',
+      resources: [
+        { name: 'Healthcare Administration Specialization', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/specializations/healthcare-administration', duration: '6 months' },
+        { name: 'MHA - Healthcare Management', provider: 'IGNOU', type: 'certification', url: 'https://ignou.ac.in/', duration: '2 years' },
+        { name: 'Healthcare Management Fundamentals', provider: 'edX', type: 'course', url: 'https://www.edx.org/learn/healthcare-management', duration: '8 weeks' },
+        { name: 'Hospital Management Basics', provider: 'Swayam', type: 'free', url: 'https://swayam.gov.in/', duration: '12 weeks' },
+      ],
     });
   }
 
@@ -82,6 +113,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '3-6 months',
       salaryRange: '₹8-20 LPA',
       growthOutlook: 'High demand across industries',
+      resources: [
+        { name: 'Google Project Management Certificate', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/google-project-management', duration: '6 months' },
+        { name: 'PMP Certification Prep', provider: 'LinkedIn Learning', type: 'certification', url: 'https://www.linkedin.com/learning/paths/prepare-for-the-pmp-certification-exam', duration: '35 hours' },
+        { name: 'Agile with Atlassian Jira', provider: 'Coursera', type: 'course', url: 'https://www.coursera.org/learn/agile-atlassian-jira', duration: '4 weeks' },
+        { name: 'Scrum Master Fundamentals', provider: 'Scrum.org', type: 'free', url: 'https://www.scrum.org/resources/what-is-scrum', duration: 'Self-paced' },
+      ],
     });
     
     if (goals === 'entrepreneurship') {
@@ -93,6 +130,12 @@ const getCareerRecommendations = (assessment: any) => {
         timeToTransition: '6-12 months',
         salaryRange: '₹10-30 LPA',
         growthOutlook: 'Growing demand for specialized consultants',
+        resources: [
+          { name: 'Business Strategy Specialization', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/specializations/business-strategy', duration: '6 months' },
+          { name: 'Management Consulting', provider: 'edX', type: 'course', url: 'https://www.edx.org/learn/management-consulting', duration: '10 weeks' },
+          { name: 'McKinsey Problem Solving', provider: 'McKinsey', type: 'free', url: 'https://www.mckinsey.com/featured-insights', duration: 'Self-paced' },
+          { name: 'Consulting Foundations', provider: 'LinkedIn Learning', type: 'course', url: 'https://www.linkedin.com/learning/consulting-foundations', duration: '2 hours' },
+        ],
       });
     }
   }
@@ -107,6 +150,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '4-8 months',
       salaryRange: '₹6-20 LPA',
       growthOutlook: 'High demand in tech companies',
+      resources: [
+        { name: 'Google UX Design Certificate', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/google-ux-design', duration: '6 months' },
+        { name: 'UI/UX Design Specialization', provider: 'CalArts', type: 'certification', url: 'https://www.coursera.org/specializations/ui-ux-design', duration: '4 months' },
+        { name: 'Figma UI Design Tutorial', provider: 'freeCodeCamp', type: 'free', url: 'https://www.youtube.com/watch?v=jwCmIBJ8Jtc', duration: '3 hours' },
+        { name: 'Design Thinking', provider: 'IDEO U', type: 'course', url: 'https://www.ideou.com/collections/design-thinking', duration: '5 weeks' },
+      ],
     });
     
     recommendations.push({
@@ -117,6 +166,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '2-4 months',
       salaryRange: '₹4-15 LPA',
       growthOutlook: 'Essential for all businesses',
+      resources: [
+        { name: 'Google Digital Marketing Certificate', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/google-digital-marketing-ecommerce', duration: '6 months' },
+        { name: 'Meta Social Media Marketing', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/facebook-social-media-marketing', duration: '7 months' },
+        { name: 'SEO Training Course', provider: 'HubSpot Academy', type: 'free', url: 'https://academy.hubspot.com/courses/seo-training', duration: '4 hours' },
+        { name: 'Google Analytics Certification', provider: 'Google', type: 'free', url: 'https://skillshop.google.com/analytics', duration: '4-6 hours' },
+      ],
     });
   }
 
@@ -130,6 +185,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '4-8 months',
       salaryRange: '₹6-18 LPA',
       growthOutlook: 'Stable demand in all sectors',
+      resources: [
+        { name: 'Financial Analyst Professional Certificate', provider: 'CFI', type: 'certification', url: 'https://corporatefinanceinstitute.com/certifications/financial-modeling-valuation-analyst-fmva-program/', duration: '6 months' },
+        { name: 'Excel Skills for Business', provider: 'Coursera', type: 'course', url: 'https://www.coursera.org/specializations/excel', duration: '6 months' },
+        { name: 'Financial Markets', provider: 'Yale (Coursera)', type: 'free', url: 'https://www.coursera.org/learn/financial-markets-global', duration: '7 weeks' },
+        { name: 'Valuation Fundamentals', provider: 'NPTEL', type: 'free', url: 'https://nptel.ac.in/', duration: '12 weeks' },
+      ],
     });
   }
 
@@ -143,6 +204,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '2-4 months',
       salaryRange: '₹5-15 LPA',
       growthOutlook: 'Growing with SaaS industry',
+      resources: [
+        { name: 'Customer Success Management', provider: 'LinkedIn Learning', type: 'course', url: 'https://www.linkedin.com/learning/customer-success-management-essentials', duration: '2 hours' },
+        { name: 'Customer Success Certification', provider: 'SuccessCOACHING', type: 'certification', url: 'https://www.successcoaching.co/', duration: '8 weeks' },
+        { name: 'HubSpot Customer Service', provider: 'HubSpot Academy', type: 'free', url: 'https://academy.hubspot.com/courses/customer-service', duration: '3 hours' },
+        { name: 'Customer Experience Fundamentals', provider: 'Udemy', type: 'course', url: 'https://www.udemy.com/topic/customer-experience/', duration: '6 hours' },
+      ],
     });
   }
 
@@ -156,6 +223,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '2-4 months',
       salaryRange: '₹4-15 LPA',
       growthOutlook: 'Essential for all businesses',
+      resources: [
+        { name: 'Google Digital Marketing Certificate', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/google-digital-marketing-ecommerce', duration: '6 months' },
+        { name: 'Meta Social Media Marketing', provider: 'Coursera', type: 'certification', url: 'https://www.coursera.org/professional-certificates/facebook-social-media-marketing', duration: '7 months' },
+        { name: 'SEO Training Course', provider: 'HubSpot Academy', type: 'free', url: 'https://academy.hubspot.com/courses/seo-training', duration: '4 hours' },
+        { name: 'Google Analytics Certification', provider: 'Google', type: 'free', url: 'https://skillshop.google.com/analytics', duration: '4-6 hours' },
+      ],
     });
     
     recommendations.push({
@@ -166,6 +239,12 @@ const getCareerRecommendations = (assessment: any) => {
       timeToTransition: '4-6 months',
       salaryRange: '₹6-18 LPA',
       growthOutlook: 'High demand in digital transformation',
+      resources: [
+        { name: 'Business Analysis Fundamentals', provider: 'Coursera', type: 'course', url: 'https://www.coursera.org/learn/business-analysis-fundamentals', duration: '4 weeks' },
+        { name: 'IIBA Entry Certificate', provider: 'IIBA', type: 'certification', url: 'https://www.iiba.org/certification/ecba/', duration: '3 months' },
+        { name: 'SQL for Business Analysts', provider: 'DataCamp', type: 'course', url: 'https://www.datacamp.com/courses/sql-for-business-analysts', duration: '4 hours' },
+        { name: 'Business Analysis Basics', provider: 'Udemy', type: 'free', url: 'https://www.udemy.com/topic/business-analysis/', duration: '5 hours' },
+      ],
     });
   }
 
@@ -427,6 +506,60 @@ export default function AssessmentResults() {
                         <Badge key={skill} variant="secondary" className="text-xs">
                           {skill}
                         </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Learning Resources */}
+                  <div className="pt-4 border-t border-border">
+                    <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      Recommended Learning Resources
+                    </p>
+                    <div className="space-y-2">
+                      {career.resources.map((resource) => (
+                        <a
+                          key={resource.name}
+                          href={resource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
+                        >
+                          <div className={`mt-0.5 p-1.5 rounded-md ${
+                            resource.type === 'free' 
+                              ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                              : resource.type === 'certification'
+                              ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                              : resource.type === 'bootcamp'
+                              ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                              : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                          }`}>
+                            <PlayCircle className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                                {resource.name}
+                              </p>
+                              <ExternalLink className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-muted-foreground">{resource.provider}</span>
+                              <span className="text-xs text-muted-foreground">•</span>
+                              <span className="text-xs text-muted-foreground">{resource.duration}</span>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-[10px] px-1.5 py-0 h-4 ${
+                                  resource.type === 'free' 
+                                    ? 'border-green-500/50 text-green-600 dark:text-green-400'
+                                    : ''
+                                }`}
+                              >
+                                {resource.type === 'free' ? 'Free' : resource.type === 'certification' ? 'Cert' : resource.type === 'bootcamp' ? 'Bootcamp' : 'Course'}
+                              </Badge>
+                            </div>
+                          </div>
+                        </a>
                       ))}
                     </div>
                   </div>
