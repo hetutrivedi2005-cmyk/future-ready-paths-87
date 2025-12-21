@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useAssessment } from '@/contexts/AssessmentContext';
+import { Link } from 'react-router-dom';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -10,18 +12,99 @@ type Message = {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/career-advisor`;
 
+const formatAssessmentForAI = (assessment: any) => {
+  const skillLabels: Record<string, string> = {
+    'communication': 'Communication & Presentation',
+    'computer-basics': 'Basic Computer Skills',
+    'data-analysis': 'Data Analysis',
+    'programming': 'Programming / Coding',
+    'project-management': 'Project Management',
+    'customer-service': 'Customer Service',
+    'sales': 'Sales & Negotiation',
+    'leadership': 'Leadership & Team Management',
+    'creative-design': 'Creative Design',
+    'technical-trade': 'Technical / Trade Skills',
+    'languages': 'Multiple Languages',
+    'problem-solving': 'Problem Solving',
+  };
+
+  const interestLabels: Record<string, string> = {
+    'technology': 'Technology & Innovation',
+    'healthcare': 'Healthcare & Wellness',
+    'business': 'Business & Entrepreneurship',
+    'creative': 'Creative & Arts',
+    'education': 'Education & Training',
+    'environment': 'Environment & Sustainability',
+    'finance': 'Finance & Economics',
+    'social-impact': 'Social Impact & Community',
+    'manufacturing': 'Manufacturing & Production',
+    'service': 'Service Industry',
+  };
+
+  const roleLabels: Record<string, string> = {
+    'student': 'Student / Fresh Graduate',
+    'entry': 'Entry-level Professional (0-2 years)',
+    'mid': 'Mid-level Professional (3-7 years)',
+    'senior': 'Senior Professional (8+ years)',
+    'gig': 'Gig Worker / Freelancer',
+    'unemployed': 'Currently Seeking Employment',
+    'career-change': 'Looking for Career Change',
+  };
+
+  const goalLabels: Record<string, string> = {
+    'higher-salary': 'Increase earning potential',
+    'new-industry': 'Transition to a new industry',
+    'promotion': 'Get promoted in current field',
+    'entrepreneurship': 'Start my own business',
+    'job-security': 'Improve job security',
+    'work-life-balance': 'Better work-life balance',
+    'passion': 'Follow my passion',
+  };
+
+  return `
+USER SKILL ASSESSMENT RESULTS:
+- Current Role: ${roleLabels[assessment.currentRole] || assessment.currentRole}
+- Industry Experience: ${assessment.experience}
+- Current Skills: ${assessment.skills.map((s: string) => skillLabels[s] || s).join(', ')}
+- Career Interests: ${assessment.interests.map((i: string) => interestLabels[i] || i).join(', ')}
+- Primary Goal: ${goalLabels[assessment.goals] || assessment.goals}
+- Preferred Work Style: ${assessment.workStyle}
+- Learning Preference: ${assessment.learningPreference}
+- Weekly Time Commitment: ${assessment.timeCommitment}
+
+Based on this assessment, provide personalized career recommendations.`;
+};
+
 const CareerAdvisorChat = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hello! I'm your AI Career Advisor. I can help you discover the best reskilling paths based on your current skills and career goals. What's your current profession or skill set, and what career direction interests you?",
-    },
-  ]);
+  const { assessment } = useAssessment();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasIntroduced, setHasIntroduced] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  const getInitialMessage = () => {
+    if (assessment) {
+      return "Hello! I've reviewed your skill assessment results. Based on your background, skills, and career goals, I can provide personalized recommendations. Would you like me to suggest some career paths that match your profile, or do you have specific questions?";
+    }
+    return "Hello! I'm your AI Career Advisor. I can help you discover the best reskilling paths based on your current skills and career goals. For more personalized recommendations, take our skill assessment quiz first! What's your current profession or skill set, and what career direction interests you?";
+  };
+
+  useEffect(() => {
+    if (isOpen && !hasIntroduced) {
+      setMessages([{ role: 'assistant', content: getInitialMessage() }]);
+      setHasIntroduced(true);
+    }
+  }, [isOpen, hasIntroduced, assessment]);
+
+  // Reset when assessment changes
+  useEffect(() => {
+    if (assessment && hasIntroduced) {
+      setMessages([{ role: 'assistant', content: getInitialMessage() }]);
+    }
+  }, [assessment]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,13 +115,18 @@ const CareerAdvisorChat = () => {
   }, [messages]);
 
   const streamChat = async (userMessages: Message[]) => {
+    // Prepend assessment context if available
+    const contextMessages = assessment 
+      ? [{ role: 'user' as const, content: formatAssessmentForAI(assessment) }, ...userMessages]
+      : userMessages;
+
     const resp = await fetch(CHAT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: userMessages }),
+      body: JSON.stringify({ messages: contextMessages }),
     });
 
     if (!resp.ok) {
@@ -112,8 +200,6 @@ const CareerAdvisorChat = () => {
         description: error instanceof Error ? error.message : 'Failed to get response',
         variant: 'destructive',
       });
-      // Remove the failed message attempt
-      setMessages(updatedMessages);
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +234,9 @@ const CareerAdvisorChat = () => {
               </div>
               <div>
                 <h3 className="font-semibold">Career Advisor</h3>
-                <p className="text-xs text-primary-foreground/80">AI-powered guidance</p>
+                <p className="text-xs text-primary-foreground/80">
+                  {assessment ? 'Personalized Mode' : 'AI-powered guidance'}
+                </p>
               </div>
             </div>
             <button
@@ -159,6 +247,18 @@ const CareerAdvisorChat = () => {
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Assessment Banner */}
+          {!assessment && (
+            <Link
+              to="/skill-assessment"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 px-4 py-2 bg-accent text-accent-foreground text-sm hover:bg-accent/80 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Take skill assessment for personalized advice</span>
+            </Link>
+          )}
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
