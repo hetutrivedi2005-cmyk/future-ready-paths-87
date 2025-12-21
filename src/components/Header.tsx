@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X, GraduationCap, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navLinks = [
@@ -49,8 +49,14 @@ export function Header() {
             ))}
           </nav>
 
-          {/* CTA Button */}
+          {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
+            <Button variant="outline" asChild className="gap-2">
+              <Link to="/skill-assessment">
+                <Sparkles className="w-4 h-4" />
+                Skill Quiz
+              </Link>
+            </Button>
             <Button asChild>
               <Link to="/contact">Get Started</Link>
             </Button>
@@ -84,7 +90,13 @@ export function Header() {
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-4 px-3">
+              <div className="pt-4 px-3 flex flex-col gap-2">
+                <Button variant="outline" asChild className="w-full gap-2">
+                  <Link to="/skill-assessment" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Sparkles className="w-4 h-4" />
+                    Skill Quiz
+                  </Link>
+                </Button>
                 <Button asChild className="w-full">
                   <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
                     Get Started
