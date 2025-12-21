@@ -18,9 +18,13 @@ import {
   MapPin,
   GraduationCap,
   ExternalLink,
-  PlayCircle
+  PlayCircle,
+  Circle,
+  Loader2
 } from 'lucide-react';
 import { useAssessment } from '@/contexts/AssessmentContext';
+import { useProgress, generateCourseId, ProgressStatus } from '@/contexts/ProgressContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface LearningResource {
   name: string;
@@ -315,6 +319,8 @@ const labelMaps = {
 export default function AssessmentResults() {
   const navigate = useNavigate();
   const { assessment, clearAssessment } = useAssessment();
+  const { getProgress, setProgress, getStats } = useProgress();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!assessment) {
@@ -325,10 +331,33 @@ export default function AssessmentResults() {
   if (!assessment) return null;
 
   const recommendations = getCareerRecommendations(assessment);
+  const stats = getStats();
 
   const handleRetake = () => {
     clearAssessment();
     navigate('/skill-assessment');
+  };
+
+  const handleProgressChange = (courseName: string, provider: string, newStatus: ProgressStatus) => {
+    const courseId = generateCourseId(courseName, provider);
+    setProgress(courseId, newStatus);
+    
+    const statusLabels = {
+      'not_started': 'Not Started',
+      'in_progress': 'In Progress',
+      'completed': 'Completed',
+    };
+    
+    toast({
+      title: `Course ${statusLabels[newStatus]}`,
+      description: `"${courseName}" marked as ${statusLabels[newStatus].toLowerCase()}.`,
+    });
+  };
+
+  const getNextStatus = (current: ProgressStatus | undefined): ProgressStatus => {
+    if (!current || current === 'not_started') return 'in_progress';
+    if (current === 'in_progress') return 'completed';
+    return 'not_started';
   };
 
   return (
@@ -344,9 +373,23 @@ export default function AssessmentResults() {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">
               Your Personalized Career Paths
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="text-lg text-muted-foreground mb-6">
               Based on your skills, interests, and goals, here are the career paths that best match your profile.
             </p>
+            
+            {/* Learning Progress Stats */}
+            {stats.total > 0 && (
+              <div className="flex items-center justify-center gap-6 mt-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                  <span className="text-muted-foreground">{stats.inProgress} In Progress</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span className="text-muted-foreground">{stats.completed} Completed</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -517,50 +560,97 @@ export default function AssessmentResults() {
                       Recommended Learning Resources
                     </p>
                     <div className="space-y-2">
-                      {career.resources.map((resource) => (
-                        <a
-                          key={resource.name}
-                          href={resource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
-                        >
-                          <div className={`mt-0.5 p-1.5 rounded-md ${
-                            resource.type === 'free' 
-                              ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                              : resource.type === 'certification'
-                              ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                              : resource.type === 'bootcamp'
-                              ? 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                              : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                          }`}>
-                            <PlayCircle className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                                {resource.name}
-                              </p>
-                              <ExternalLink className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      {career.resources.map((resource) => {
+                        const courseId = generateCourseId(resource.name, resource.provider);
+                        const progress = getProgress(courseId);
+                        const currentStatus = progress?.status || 'not_started';
+                        
+                        return (
+                          <div
+                            key={resource.name}
+                            className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
+                          >
+                            {/* Progress Button */}
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleProgressChange(resource.name, resource.provider, getNextStatus(currentStatus));
+                              }}
+                              className={`mt-0.5 p-1.5 rounded-md transition-all hover:scale-110 ${
+                                currentStatus === 'completed'
+                                  ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
+                                  : currentStatus === 'in_progress'
+                                  ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                                  : 'bg-muted-foreground/10 text-muted-foreground hover:bg-primary/10 hover:text-primary'
+                              }`}
+                              title={
+                                currentStatus === 'not_started' 
+                                  ? 'Click to mark as In Progress' 
+                                  : currentStatus === 'in_progress'
+                                  ? 'Click to mark as Completed'
+                                  : 'Click to reset'
+                              }
+                            >
+                              {currentStatus === 'completed' ? (
+                                <CheckCircle2 className="w-4 h-4" />
+                              ) : currentStatus === 'in_progress' ? (
+                                <Loader2 className="w-4 h-4" />
+                              ) : (
+                                <Circle className="w-4 h-4" />
+                              )}
+                            </button>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-2">
+                                <a
+                                  href={resource.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm font-medium text-foreground hover:text-primary transition-colors line-clamp-1"
+                                >
+                                  {resource.name}
+                                </a>
+                                <a
+                                  href={resource.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-shrink-0"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:text-primary" />
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                <span className="text-xs text-muted-foreground">{resource.provider}</span>
+                                <span className="text-xs text-muted-foreground">•</span>
+                                <span className="text-xs text-muted-foreground">{resource.duration}</span>
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-[10px] px-1.5 py-0 h-4 ${
+                                    resource.type === 'free' 
+                                      ? 'border-green-500/50 text-green-600 dark:text-green-400'
+                                      : ''
+                                  }`}
+                                >
+                                  {resource.type === 'free' ? 'Free' : resource.type === 'certification' ? 'Cert' : resource.type === 'bootcamp' ? 'Bootcamp' : 'Course'}
+                                </Badge>
+                                {currentStatus !== 'not_started' && (
+                                  <Badge 
+                                    variant="secondary"
+                                    className={`text-[10px] px-1.5 py-0 h-4 ${
+                                      currentStatus === 'completed'
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                    }`}
+                                  >
+                                    {currentStatus === 'completed' ? 'Completed' : 'In Progress'}
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs text-muted-foreground">{resource.provider}</span>
-                              <span className="text-xs text-muted-foreground">•</span>
-                              <span className="text-xs text-muted-foreground">{resource.duration}</span>
-                              <Badge 
-                                variant="outline" 
-                                className={`text-[10px] px-1.5 py-0 h-4 ${
-                                  resource.type === 'free' 
-                                    ? 'border-green-500/50 text-green-600 dark:text-green-400'
-                                    : ''
-                                }`}
-                              >
-                                {resource.type === 'free' ? 'Free' : resource.type === 'certification' ? 'Cert' : resource.type === 'bootcamp' ? 'Bootcamp' : 'Course'}
-                              </Badge>
-                            </div>
                           </div>
-                        </a>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
