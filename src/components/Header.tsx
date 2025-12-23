@@ -77,17 +77,24 @@ export function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild className="gap-2 cursor-pointer">
+                    <Link to="/profile">
+                      <User className="w-4 h-4" />
+                      My Profile
+                    </Link>
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild className="gap-2 cursor-pointer">
                         <Link to="/admin">
                           <Shield className="w-4 h-4" />
                           Admin Dashboard
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator />
                     </>
                   )}
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()} className="gap-2 cursor-pointer">
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -141,6 +148,12 @@ export function Header() {
                 </Button>
                 {user ? (
                   <>
+                    <Button variant="outline" asChild className="w-full gap-2">
+                      <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                        <User className="w-4 h-4" />
+                        My Profile
+                      </Link>
+                    </Button>
                     {isAdmin && (
                       <Button variant="outline" asChild className="w-full gap-2">
                         <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
