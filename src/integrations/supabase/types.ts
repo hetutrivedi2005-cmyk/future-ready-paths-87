@@ -50,27 +50,48 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          career_goals: string | null
           created_at: string
+          current_occupation: string | null
+          education_level: string | null
+          field_of_study: string | null
           id: string
+          skills: string[] | null
+          target_sector: string | null
           updated_at: string
           user_id: string
           username: string | null
+          years_of_experience: number | null
         }
         Insert: {
           avatar_url?: string | null
+          career_goals?: string | null
           created_at?: string
+          current_occupation?: string | null
+          education_level?: string | null
+          field_of_study?: string | null
           id?: string
+          skills?: string[] | null
+          target_sector?: string | null
           updated_at?: string
           user_id: string
           username?: string | null
+          years_of_experience?: number | null
         }
         Update: {
           avatar_url?: string | null
+          career_goals?: string | null
           created_at?: string
+          current_occupation?: string | null
+          education_level?: string | null
+          field_of_study?: string | null
           id?: string
+          skills?: string[] | null
+          target_sector?: string | null
           updated_at?: string
           user_id?: string
           username?: string | null
+          years_of_experience?: number | null
         }
         Relationships: []
       }

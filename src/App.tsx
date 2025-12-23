@@ -15,6 +15,7 @@ import Contact from "./pages/Contact";
 import SkillAssessment from "./pages/SkillAssessment";
 import AssessmentResults from "./pages/AssessmentResults";
 import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/skill-assessment" element={<SkillAssessment />} />
                 <Route path="/assessment-results" element={<AssessmentResults />} />
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/profile" element={<Profile />} />
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
