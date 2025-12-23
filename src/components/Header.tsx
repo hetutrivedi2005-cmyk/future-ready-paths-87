@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, GraduationCap, Sparkles, LogIn, LogOut, User } from "lucide-react";
+import { Menu, X, GraduationCap, Sparkles, LogIn, LogOut, User, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -23,6 +25,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminCheck();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -74,6 +77,17 @@ export function Header() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuItem asChild className="gap-2 cursor-pointer">
+                        <Link to="/admin">
+                          <Shield className="w-4 h-4" />
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
                   <DropdownMenuItem onClick={() => signOut()} className="gap-2 cursor-pointer">
                     <LogOut className="w-4 h-4" />
                     Sign Out
@@ -126,17 +140,27 @@ export function Header() {
                   </Link>
                 </Button>
                 {user ? (
-                  <Button 
-                    variant="outline" 
-                    className="w-full gap-2"
-                    onClick={() => {
-                      signOut();
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Sign Out
-                  </Button>
+                  <>
+                    {isAdmin && (
+                      <Button variant="outline" asChild className="w-full gap-2">
+                        <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Shield className="w-4 h-4" />
+                          Admin Dashboard
+                        </Link>
+                      </Button>
+                    )}
+                    <Button 
+                      variant="outline" 
+                      className="w-full gap-2"
+                      onClick={() => {
+                        signOut();
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </Button>
+                  </>
                 ) : (
                   <Button asChild className="w-full gap-2">
                     <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>

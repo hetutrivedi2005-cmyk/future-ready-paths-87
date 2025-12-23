@@ -16,6 +16,11 @@ import SkillAssessment from "./pages/SkillAssessment";
 import AssessmentResults from "./pages/AssessmentResults";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminProgress from "./pages/admin/AdminProgress";
+import AdminContent from "./pages/admin/AdminContent";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +43,12 @@ const App = () => (
                 <Route path="/skill-assessment" element={<SkillAssessment />} />
                 <Route path="/assessment-results" element={<AssessmentResults />} />
                 <Route path="/auth" element={<Auth />} />
+                {/* Admin Routes */}
+                <Route path="/admin" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/progress" element={<AdminProgress />} />
+                <Route path="/admin/content" element={<AdminContent />} />
+                <Route path="/admin/analytics" element={<AdminAnalytics />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
