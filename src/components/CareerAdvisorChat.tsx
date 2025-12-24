@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAssessment } from '@/contexts/AssessmentContext';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -115,6 +116,13 @@ const CareerAdvisorChat = () => {
   }, [messages]);
 
   const streamChat = async (userMessages: Message[]) => {
+    // Get current session for authenticated requests
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.access_token) {
+      throw new Error('Please sign in to use the career advisor');
+    }
+
     // Prepend assessment context if available
     const contextMessages = assessment 
       ? [{ role: 'user' as const, content: formatAssessmentForAI(assessment) }, ...userMessages]
@@ -124,11 +132,10 @@ const CareerAdvisorChat = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        'Authorization': `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({ messages: contextMessages }),
     });
-
     if (!resp.ok) {
       const errorData = await resp.json().catch(() => ({}));
       throw new Error(errorData.error || `Request failed with status ${resp.status}`);

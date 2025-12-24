@@ -1,4 +1,4 @@
 project_id = "twiuebrigqecqplrkndf"
 
 [functions.career-advisor]
-verify_jwt = false
+verify_jwt = true
