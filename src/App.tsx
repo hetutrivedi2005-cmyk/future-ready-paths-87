@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Sectors from "./pages/Sectors";
 import Learning from "./pages/Learning";
+import Courses from "./pages/Courses";
 import Roadmaps from "./pages/Roadmaps";
 import Contact from "./pages/Contact";
 import SkillAssessment from "./pages/SkillAssessment";
@@ -39,6 +40,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/sectors" element={<Sectors />} />
                 <Route path="/learning" element={<Learning />} />
+                <Route path="/courses" element={<Courses />} />
                 <Route path="/roadmaps" element={<Roadmaps />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/skill-assessment" element={<SkillAssessment />} />
