@@ -1,6 +1,6 @@
 # Future-Ready Paths 🚀
 
-Future-Ready Paths is a web-based platform designed to help individuals become job-ready by learning relevant skills through structured learning paths, community support, and verified certifications.  
+Future-Ready Paths is a web-based platform designed to help individuals become job-ready by learning relevant skills through structured learning paths, community support,and verified certifications.  
 The platform focuses on reducing the skill gap and preparing users for future workforce demands.
 
 🔗 Live Website: http://bit.ly/4aDLGIu
