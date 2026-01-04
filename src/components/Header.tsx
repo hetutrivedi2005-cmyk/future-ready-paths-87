@@ -14,12 +14,11 @@ import {
 
 const navLinks = [
   { name: "Home", path: "/" },
-  { name: "About", path: "/about" },
-  { name: "Sectors & Skills", path: "/sectors" },
-  { name: "Learning Model", path: "/learning" },
+  { name: "Dashboard", path: "/dashboard" },
   { name: "Courses", path: "/courses" },
   { name: "Career Roadmaps", path: "/roadmaps" },
-  { name: "Join Us", path: "/contact" },
+  { name: "Sectors", path: "/sectors" },
+  { name: "About", path: "/about" },
 ];
 
 export function Header() {
