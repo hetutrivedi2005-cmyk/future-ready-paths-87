@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
+import { useProgress } from "@/contexts/ProgressContext";
+import { ProgressBar } from "@/components/dashboard/ProgressBar";
+import { courses, videoLectures } from "@/data/courseData";
 import {
   Play,
   Clock,
@@ -13,190 +16,31 @@ import {
   Award,
   ArrowRight,
   ExternalLink,
+  CheckCircle2,
+  TrendingUp,
 } from "lucide-react";
 
-interface VideoLecture {
-  id: string;
-  title: string;
-  instructor: string;
-  duration: string;
-  thumbnail: string;
-  videoId: string;
-  views: string;
-  rating: number;
-  category: string;
-}
-
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  instructor: string;
-  duration: string;
-  level: string;
-  students: string;
-  rating: number;
-  lectures: number;
-  category: string;
-  image: string;
-  featured?: boolean;
-}
-
-const videoLectures: VideoLecture[] = [
-  {
-    id: "1",
-    title: "Introduction to Python Programming",
-    instructor: "Dr. Angela Yu",
-    duration: "2:15:30",
-    thumbnail: "https://img.youtube.com/vi/rfscVS0vtbw/maxresdefault.jpg",
-    videoId: "rfscVS0vtbw",
-    views: "12M",
-    rating: 4.9,
-    category: "Technology",
-  },
-  {
-    id: "2",
-    title: "Machine Learning Full Course",
-    instructor: "Andrew Ng",
-    duration: "3:45:00",
-    thumbnail: "https://img.youtube.com/vi/GwIo3gDZCVQ/maxresdefault.jpg",
-    videoId: "GwIo3gDZCVQ",
-    views: "8.5M",
-    rating: 4.8,
-    category: "Technology",
-  },
-  {
-    id: "3",
-    title: "Digital Marketing Masterclass",
-    instructor: "Neil Patel",
-    duration: "1:45:20",
-    thumbnail: "https://img.youtube.com/vi/hiHMGCaQPxA/maxresdefault.jpg",
-    videoId: "hiHMGCaQPxA",
-    views: "2.1M",
-    rating: 4.7,
-    category: "Marketing",
-  },
-  {
-    id: "4",
-    title: "Data Science with R Programming",
-    instructor: "Kirill Eremenko",
-    duration: "4:20:00",
-    thumbnail: "https://img.youtube.com/vi/_V8eKsto3Ug/maxresdefault.jpg",
-    videoId: "_V8eKsto3Ug",
-    views: "3.2M",
-    rating: 4.6,
-    category: "Technology",
-  },
-  {
-    id: "5",
-    title: "JavaScript Complete Tutorial",
-    instructor: "Mosh Hamedani",
-    duration: "3:30:45",
-    thumbnail: "https://img.youtube.com/vi/W6NZfCO5SIk/maxresdefault.jpg",
-    videoId: "W6NZfCO5SIk",
-    views: "15M",
-    rating: 4.9,
-    category: "Technology",
-  },
-  {
-    id: "6",
-    title: "Project Management Fundamentals",
-    instructor: "Mike Clayton",
-    duration: "2:00:00",
-    thumbnail: "https://img.youtube.com/vi/uWPIsaYpY7U/maxresdefault.jpg",
-    videoId: "uWPIsaYpY7U",
-    views: "1.8M",
-    rating: 4.5,
-    category: "Business",
-  },
-];
-
-const courses: Course[] = [
-  {
-    id: "1",
-    title: "Full Stack Web Development",
-    description: "Master HTML, CSS, JavaScript, React, Node.js, and databases to become a complete web developer.",
-    instructor: "Colt Steele",
-    duration: "60 hours",
-    level: "Beginner to Advanced",
-    students: "125K",
-    rating: 4.8,
-    lectures: 450,
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400",
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "Data Analysis with Python",
-    description: "Learn data analysis using Python, Pandas, NumPy, and visualization libraries.",
-    instructor: "Jose Portilla",
-    duration: "45 hours",
-    level: "Intermediate",
-    students: "89K",
-    rating: 4.7,
-    lectures: 280,
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400",
-  },
-  {
-    id: "3",
-    title: "Cloud Computing with AWS",
-    description: "Comprehensive AWS training covering EC2, S3, Lambda, and more for cloud certification.",
-    instructor: "Stephane Maarek",
-    duration: "35 hours",
-    level: "Intermediate",
-    students: "67K",
-    rating: 4.9,
-    lectures: 220,
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400",
-    featured: true,
-  },
-  {
-    id: "4",
-    title: "Digital Marketing Complete Course",
-    description: "Master SEO, social media marketing, content marketing, and paid advertising strategies.",
-    instructor: "Brad Traversy",
-    duration: "40 hours",
-    level: "Beginner",
-    students: "54K",
-    rating: 4.6,
-    lectures: 190,
-    category: "Marketing",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400",
-  },
-  {
-    id: "5",
-    title: "Healthcare Management",
-    description: "Learn healthcare administration, hospital management, and healthcare policies.",
-    instructor: "Dr. Sarah Johnson",
-    duration: "30 hours",
-    level: "Intermediate",
-    students: "23K",
-    rating: 4.5,
-    lectures: 150,
-    category: "Healthcare",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400",
-  },
-  {
-    id: "6",
-    title: "Financial Analysis & Modeling",
-    description: "Excel-based financial modeling, valuation techniques, and investment analysis.",
-    instructor: "Chris Haroun",
-    duration: "25 hours",
-    level: "Advanced",
-    students: "45K",
-    rating: 4.7,
-    lectures: 165,
-    category: "Finance",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400",
-  },
-];
-
-const categories = ["All", "Technology", "Marketing", "Business", "Healthcare", "Finance"];
+const categories = ["All", "Technology", "Design", "Marketing"];
 
 export default function Courses() {
+  const { progress, getProgress } = useProgress();
+
+  // Get course progress
+  const getCourseProgress = (courseId: string) => {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) return null;
+
+    const courseProgress = getProgress(courseId);
+    const moduleProgresses = course.modules.map(m => getProgress(`${courseId}-${m.id}`));
+    const completedModules = moduleProgresses.filter(p => p?.status === 'completed').length;
+    
+    return {
+      status: courseProgress?.status || 'not_started',
+      completedModules,
+      totalModules: course.modules.length,
+    };
+  };
+
   return (
     <Layout>
       {/* Hero */}
@@ -315,64 +159,114 @@ export default function Courses() {
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {courses
                     .filter((course) => category === "All" || course.category === category)
-                    .map((course) => (
-                      <div
-                        key={course.id}
-                        className="group bg-card rounded-xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all hover:shadow-lg"
-                      >
-                        <div className="relative h-48 overflow-hidden">
-                          <img
-                            src={course.image}
-                            alt={course.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          {course.featured && (
-                            <Badge className="absolute top-3 left-3 bg-primary">
-                              Featured
+                    .map((course) => {
+                      const prog = getCourseProgress(course.id);
+                      const progressPercent = prog 
+                        ? (prog.completedModules / prog.totalModules) * 100 
+                        : 0;
+
+                      return (
+                        <div
+                          key={course.id}
+                          className="group bg-card rounded-xl border border-border/50 overflow-hidden hover:border-primary/30 transition-all hover:shadow-lg"
+                        >
+                          <div className="relative h-48 overflow-hidden">
+                            <img
+                              src={course.image}
+                              alt={course.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                            {course.featured && (
+                              <Badge className="absolute top-3 left-3 bg-primary">
+                                Featured
+                              </Badge>
+                            )}
+                            <Badge className="absolute top-3 right-3 bg-background/90">
+                              {course.level}
                             </Badge>
-                          )}
-                          <Badge className="absolute top-3 right-3 bg-background/90">
-                            {course.level}
-                          </Badge>
-                        </div>
-                        <div className="p-5">
-                          <h3 className="font-semibold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
-                            {course.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                            {course.description}
-                          </p>
-                          <p className="text-sm text-muted-foreground mb-3">
-                            By <span className="text-foreground">{course.instructor}</span>
-                          </p>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {course.duration}
+                            {prog?.status === 'completed' && (
+                              <div className="absolute bottom-3 right-3 bg-green-500 text-white p-1.5 rounded-full">
+                                <CheckCircle2 className="h-4 w-4" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-5">
+                            <h3 className="font-semibold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
+                              {course.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                              {course.description}
+                            </p>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              By <span className="text-foreground">{course.instructor}</span>
+                            </p>
+                            
+                            {/* Skills preview */}
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {course.skills.slice(0, 3).map((skill) => (
+                                <Badge key={skill} variant="outline" className="text-xs">
+                                  {skill}
+                                </Badge>
+                              ))}
+                              {course.skills.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{course.skills.length - 3}
+                                </Badge>
+                              )}
                             </div>
-                            <div className="flex items-center gap-1">
-                              <BookOpen className="h-4 w-4" />
-                              {course.lectures} lectures
+
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-4 w-4" />
+                                {course.duration}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <BookOpen className="h-4 w-4" />
+                                {course.modules.length} modules
+                              </div>
+                            </div>
+
+                            {/* Progress bar for enrolled courses */}
+                            {prog && prog.status !== 'not_started' && (
+                              <div className="mb-4">
+                                <ProgressBar 
+                                  progress={progressPercent} 
+                                  status={prog.status}
+                                  size="sm"
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {prog.completedModules} of {prog.totalModules} modules
+                                </p>
+                              </div>
+                            )}
+
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-4 text-sm">
+                                <span className="flex items-center gap-1 text-amber-500">
+                                  <Star className="h-4 w-4 fill-current" />
+                                  {course.rating}
+                                </span>
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <Users className="h-4 w-4" />
+                                  {course.students}
+                                </span>
+                              </div>
+                              <Button asChild size="sm" variant={prog?.status === 'completed' ? 'outline' : 'default'} className="gap-1">
+                                <Link to={`/course/${course.id}`}>
+                                  {prog?.status === 'completed' ? (
+                                    <>Review</>
+                                  ) : prog?.status === 'in_progress' ? (
+                                    <>Continue <TrendingUp className="h-3 w-3" /></>
+                                  ) : (
+                                    <>Start <ArrowRight className="h-3 w-3" /></>
+                                  )}
+                                </Link>
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="flex items-center gap-1 text-amber-500">
-                                <Star className="h-4 w-4 fill-current" />
-                                {course.rating}
-                              </span>
-                              <span className="flex items-center gap-1 text-muted-foreground">
-                                <Users className="h-4 w-4" />
-                                {course.students}
-                              </span>
-                            </div>
-                            <Button size="sm" variant="outline" className="gap-1">
-                              Enroll <ExternalLink className="h-3 w-3" />
-                            </Button>
-                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </TabsContent>
             ))}
@@ -399,7 +293,7 @@ export default function Courses() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
-                  <Link to="/learning">View Learning Model</Link>
+                  <Link to="/dashboard">View Dashboard</Link>
                 </Button>
               </div>
             </div>
