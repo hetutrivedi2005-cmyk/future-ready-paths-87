@@ -8,6 +8,8 @@ The platform focuses on reducing the skill gap and preparing users for future wo
 ---
 
 
+## 📌 Problem Statement
+
 Many learners struggle to stay relevant in a rapidly changing job market due to:
 - Low course completion rates  
 - Outdated or irrelevant skills  
